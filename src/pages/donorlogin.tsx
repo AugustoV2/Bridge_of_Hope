@@ -16,7 +16,7 @@ const DonorLogin = () => {
     setIsLoading(true);
 
     try {
-      const response = await axios.post('https://classical-lorinda-blaaaaug-8f2c0766.koyeb.app/login', {
+      const response = await axios.post('https://nnr0wds4-8000.inc1.devtunnels.ms/login', {
         email,
         password,
         user_type: 'donor',
@@ -43,7 +43,7 @@ const DonorLogin = () => {
     setIsLoading(true);
 
     try {
-      const response = await axios.post('https://classical-lorinda-blaaaaug-8f2c0766.koyeb.app/register', {
+      const response = await axios.post('https://nnr0wds4-8000.inc1.devtunnels.ms/register', {
         email,
         password,
         user_type: 'donor',
