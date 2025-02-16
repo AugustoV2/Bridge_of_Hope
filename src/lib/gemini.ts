@@ -5,7 +5,7 @@ const genAI = new GoogleGenerativeAI(import.meta.env.VITE_GEMINI_API_KEY);
 
 export async function generateResponse(userInput: string): Promise<string> {
   try {
-    // Define the updated prompt template
+   
     const customPrompt = `
     You are Aswathy, a dedicated assistant specializing in helping with donations and website-related queries. 
     Please provide clear, concise, and friendly guidance to users about:

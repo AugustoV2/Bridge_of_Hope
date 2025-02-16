@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { Mail, Lock, User } from 'lucide-react';
 import toast from 'react-hot-toast';
-import { supabase } from '../lib/supabase';
+import axios from 'axios';
 
 const DonorLogin = () => {
   const navigate = useNavigate();
@@ -16,18 +16,23 @@ const DonorLogin = () => {
     setIsLoading(true);
 
     try {
-      const { data: { user }, error } = await supabase.auth.signInWithPassword({
+      const response = await axios.post('http://127.0.0.1:5000/login', {
         email,
         password,
+        user_type: 'donor',
       });
+      console.log(response.data.message);
 
-      if (error) throw error;
-
-      if (user) {
+      if (response.data.message === 'Login successful' && response.data.Details === 'Yes') {
+        localStorage.setItem('donor_id', response.data.donor_id);
+        navigate('/register/DonorHome');
+      } 
+      else if (response.data.message === 'Login successful' && response.data.Details === 'No') {
+        localStorage.setItem('donor_id', response.data.donor_id);
         navigate('/register/donor');
       }
     } catch (error: any) {
-      toast.error(error.message);
+      toast.error(error.response?.data?.message || 'Login failed. Please try again.');
     } finally {
       setIsLoading(false);
     }
@@ -38,31 +43,18 @@ const DonorLogin = () => {
     setIsLoading(true);
 
     try {
-      const { data: { user }, error } = await supabase.auth.signUp({
+      const response = await axios.post('http://127.0.0.1:5000/register', {
         email,
         password,
+        user_type: 'donor',
       });
 
-      if (error) throw error;
-
-      if (user) {
-        const { error: profileError } = await supabase
-          .from('users')
-          .insert([
-            {
-              id: user.id,
-              email: user.email,
-              user_type: 'donor',
-            },
-          ]);
-
-        if (profileError) throw profileError;
-
+      if (response.data.user) {
         toast.success('Account created successfully! Please check your email for verification.');
         navigate('/register/donor');
       }
     } catch (error: any) {
-      toast.error(error.message);
+      toast.error(error.response?.data?.message || 'Signup failed. Please try again.');
     } finally {
       setIsLoading(false);
     }

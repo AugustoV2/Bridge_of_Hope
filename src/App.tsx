@@ -12,6 +12,7 @@ import DonationItems from './pages/Donoritems';
 import OrganisationLogin from './pages/organisationlogin';
 import OrgHome from './pages/Orghome';
 import OrgPickups from './pages/OrgPickups';
+import DonationItemDetails from './pages/DonateitemDetails';
 
 function App() {
   return (
@@ -30,6 +31,7 @@ function App() {
             <Route path="/organisationlogin" element={<OrganisationLogin />} />
             <Route path="/OrgHome" element={<OrgHome />} />
             <Route path="/orgpickups" element={<OrgPickups />} />
+            <Route path="/item/:id" element={<DonationItemDetails />} />
 
 
 

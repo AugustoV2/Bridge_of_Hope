@@ -1,8 +1,8 @@
-import React from 'react';
+
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { User, Building2 } from 'lucide-react';
-import DonorLogin from './donorlogin';
+
 
 const UserTypeSelection = () => {
   const navigate = useNavigate();

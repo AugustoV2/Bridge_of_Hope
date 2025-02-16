@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { motion } from 'framer-motion';
 import { ArrowLeft, Box, Heart } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
@@ -61,7 +61,6 @@ const donationItems: DonationItem[] = [
     image: "https://images.unsplash.com/photo-1524578271613-d550eacf6090?auto=format&fit=crop&q=80&w=500",
     impact: "Promotes literacy and learning"
   },
-
   {
     id: 7,
     name: "Other",
@@ -82,6 +81,10 @@ const DonationItems = () => {
         ? prev.filter(id => id !== itemId)
         : [...prev, itemId]
     );
+  };
+
+  const handleItemClick = (itemId: number) => {
+    navigate(`/item/${itemId}`);
   };
 
   return (
@@ -121,9 +124,10 @@ const DonationItems = () => {
             <motion.div
               key={item.id}
               whileHover={{ scale: 1.02 }}
-              className={`bg-white rounded-xl shadow-md overflow-hidden ${
+              className={`bg-white rounded-xl shadow-md overflow-hidden cursor-pointer ${
                 selectedItems.includes(item.id) ? 'ring-2 ring-rose-500' : ''
               }`}
+              onClick={() => handleItemClick(item.id)}
             >
               <div className="relative h-48">
                 <img
@@ -134,7 +138,10 @@ const DonationItems = () => {
                 <div className="absolute top-4 right-4">
                   <motion.button
                     whileTap={{ scale: 0.9 }}
-                    onClick={() => toggleItem(item.id)}
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      toggleItem(item.id);
+                    }}
                     className={`p-2 rounded-full ${
                       selectedItems.includes(item.id)
                         ? 'bg-rose-500 text-white'
