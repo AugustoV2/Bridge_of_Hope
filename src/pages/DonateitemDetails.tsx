@@ -40,6 +40,8 @@ const DonationItemDetails = () => {
   const [notes, setNotes] = useState("");
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [apiResponse, setApiResponse] = useState<string>('');
+  const [analyzing, setAnalyzing] = useState(false);
 
   const handleImageCapture = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -58,6 +60,27 @@ const DonationItemDetails = () => {
     }
   };
 
+  const handleImageClick = async () => {
+    if (!image) return;
+    
+    setAnalyzing(true);
+    try {
+      const response = await fetch('https://nnr0wds4-8000.inc1.devtunnels.ms/imageupload', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ image }),
+      });
+      const data = await response.json();
+      setApiResponse(JSON.stringify(data, null, 2));
+    } catch (error) {
+      setApiResponse('Error analyzing image: ' + (error as Error).message);
+    } finally {
+      setAnalyzing(false);
+    }
+  };
+
   const handleSubmit = async () => {
     if (!selectedCondition || !image) {
       alert("Please select a condition and add an image of the item");
@@ -66,10 +89,8 @@ const DonationItemDetails = () => {
 
     setIsSubmitting(true);
 
-    // Simulated API call
     try {
-      // Replace with your actual API endpoint
-      const response = await fetch('/api/donations', {
+      const response = await fetch('https://nnr0wds4-8000.inc1.devtunnels.ms/donations', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -117,6 +138,20 @@ const DonationItemDetails = () => {
           </p>
         </div>
 
+        {/* API Response Display */}
+        {(apiResponse || analyzing) && (
+          <div className="mb-8 bg-white rounded-lg shadow-md p-4">
+            <h3 className="text-lg font-semibold mb-2">Image Analysis Results</h3>
+            {analyzing ? (
+              <div className="animate-pulse text-gray-500">Analyzing image...</div>
+            ) : (
+              <pre className="bg-gray-50 p-4 rounded-md overflow-x-auto text-sm">
+                {apiResponse}
+              </pre>
+            )}
+          </div>
+        )}
+
         {/* Condition Selection */}
         <div className="mb-8">
           <h2 className="text-xl font-semibold text-gray-900 mb-4">Select Item Condition</h2>
@@ -163,14 +198,23 @@ const DonationItemDetails = () => {
                 <img
                   src={image}
                   alt="Captured item"
-                  className="w-full h-64 object-cover rounded-lg"
+                  className="w-full h-64 object-cover rounded-lg cursor-pointer"
+                  onClick={handleImageClick}
                 />
-                <button
-                  onClick={openCamera}
-                  className="absolute bottom-4 right-4 bg-white p-2 rounded-full shadow-lg"
-                >
-                  <Camera className="h-6 w-6 text-gray-600" />
-                </button>
+                <div className="absolute bottom-4 right-4 flex space-x-2">
+                  <button
+                    onClick={handleImageClick}
+                    className="bg-white p-2 rounded-full shadow-lg hover:bg-gray-50"
+                  >
+                    <Upload className="h-6 w-6 text-gray-600" />
+                  </button>
+                  <button
+                    onClick={openCamera}
+                    className="bg-white p-2 rounded-full shadow-lg hover:bg-gray-50"
+                  >
+                    <Camera className="h-6 w-6 text-gray-600" />
+                  </button>
+                </div>
               </div>
             ) : (
               <motion.button
