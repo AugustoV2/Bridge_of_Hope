@@ -22,7 +22,7 @@ const DonorRegistration = () => {
     setIsLoading(true);
 
     try {
-      const response = await axios.post('http://127.0.0.1:5000/donor', {
+      const response = await axios.post('https://nnr0wds4-8000.inc1.devtunnels.ms/donor', {
         full_name: formData.fullName,
         phone_number: formData.phoneNumber,
         address: formData.address,
