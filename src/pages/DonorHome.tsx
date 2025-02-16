@@ -45,7 +45,7 @@ const DonorHome = () => {
     const fetchDonorData = async () => {
       try {
         const donorId = localStorage.getItem('donor_id');
-        const response = await axios.get(`http://127.0.0.1:5000/donordetails?donor_id=${donorId}`);
+        const response = await axios.get(`https://classical-lorinda-blaaaaug-8f2c0766.koyeb.app/donordetails?donor_id=${donorId}`);
         setDonorData(response.data || dummyData);
       } catch (err) {
         setDonorData(dummyData);

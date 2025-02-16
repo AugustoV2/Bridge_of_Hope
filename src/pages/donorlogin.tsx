@@ -16,7 +16,7 @@ const DonorLogin = () => {
     setIsLoading(true);
 
     try {
-      const response = await axios.post('http://127.0.0.1:5000/login', {
+      const response = await axios.post('https://classical-lorinda-blaaaaug-8f2c0766.koyeb.app/login', {
         email,
         password,
         user_type: 'donor',
@@ -43,7 +43,7 @@ const DonorLogin = () => {
     setIsLoading(true);
 
     try {
-      const response = await axios.post('http://127.0.0.1:5000/register', {
+      const response = await axios.post('https://classical-lorinda-blaaaaug-8f2c0766.koyeb.app/register', {
         email,
         password,
         user_type: 'donor',
