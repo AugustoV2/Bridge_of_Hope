@@ -5,9 +5,8 @@ from bson.objectid import ObjectId
 from flask_cors import CORS
 
 app = Flask(__name__)
-app.config["MONGO_URI"] = "mongodb+srv://augu:bzHOV28wdOKH4XdK@bridgeofhope.yswec.mongodb.net/BridgeOfHope"
-app.config["SECRET_KEY"] = "AIzaSyBJDY0aaMmot7gJGb1iPEINDxlgG9tj0bk"
-
+app.config["MONGO_URI"] = os.getenv("MONGO_URI")
+app.config["SECRET_KEY"] = os.getenv("SECRET_KEY")
 
 mongo = PyMongo(app)
 bcrypt = Bcrypt(app)
