@@ -25,11 +25,11 @@ const DonorLogin = () => {
 
       if (response.data.message === 'Login successful' && response.data.Details === 'Yes') {
         localStorage.setItem('donor_id', response.data.donor_id);
-        navigate('/register/DonorHome');
+        navigate('/DonorHome');
       } 
       else if (response.data.message === 'Login successful' && response.data.Details === 'No') {
         localStorage.setItem('donor_id', response.data.donor_id);
-        navigate('/register/donor');
+        navigate('/donor');
       }
     } catch (error: any) {
       toast.error(error.response?.data?.message || 'Login failed. Please try again.');
@@ -51,7 +51,7 @@ const DonorLogin = () => {
 
       if (response.data.user) {
         toast.success('Account created successfully! Please check your email for verification.');
-        navigate('/register/donor');
+        navigate('/donor');
       }
     } catch (error: any) {
       toast.error(error.response?.data?.message || 'Signup failed. Please try again.');
