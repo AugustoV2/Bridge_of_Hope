@@ -49,7 +49,7 @@ const OrganizationLogin = () => {
     setIsLoading(true);
 
     try {
-      const response = await axios.post('https://nnr0wds4-8000.inc1.devtunnels.ms/register', {
+      const response = await axios.post('https://classical-lorinda-blaaaaug-8f2c0766.koyeb.app/register', {
         email,
         password,
         user_type: 'organization',

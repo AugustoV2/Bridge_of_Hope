@@ -130,15 +130,15 @@ const PickupRequests = () => {
     const fetchData = async () => {
       try {
         // Fetch active pickup requests
-        const pickupResponse = await axios.get(`https://nnr0wds4-8000.inc1.devtunnels.ms/organisationPickup?${localStorage.getItem("organizations_id")}`);
+        const pickupResponse = await axios.get(`https://classical-lorinda-blaaaaug-8f2c0766.koyeb.app/organisationPickup?${localStorage.getItem("organizations_id")}`);
         const pickupData = pickupResponse.data;
 
         // Fetch accepted requests
-        const acceptedResponse = await axios.get('https://nnr0wds4-8000.inc1.devtunnels.ms/req_accept');
+        const acceptedResponse = await axios.get('https://classical-lorinda-blaaaaug-8f2c0766.koyeb.app/req_accept');
         const acceptedData = acceptedResponse.data;
 
         // Fetch declined requests
-        const declinedResponse = await axios.get('https://nnr0wds4-8000.inc1.devtunnels.ms/req_decline');
+        const declinedResponse = await axios.get('https://classical-lorinda-blaaaaug-8f2c0766.koyeb.app/req_decline');
         const declinedData = declinedResponse.data;
 
         // Combine all requests
@@ -148,7 +148,7 @@ const PickupRequests = () => {
         const donorIds = [...new Set(allRequests.map((request: PickupRequest) => request.donor_id))];
 
         // Fetch donor details
-        const donorDetailsResponse = await axios.get('https://nnr0wds4-8000.inc1.devtunnels.ms/donorInfo', {
+        const donorDetailsResponse = await axios.get('https://classical-lorinda-blaaaaug-8f2c0766.koyeb.app/donorInfo', {
           params: { donor_ids: donorIds.join(',') }
         });
 
@@ -207,7 +207,7 @@ const PickupRequests = () => {
   const confirmAccept = async () => {
     if (selectedRequest) {
       try {
-        const response = await axios.post('https://nnr0wds4-8000.inc1.devtunnels.ms/acceptRequest', {
+        const response = await axios.post('https://classical-lorinda-blaaaaug-8f2c0766.koyeb.app/acceptRequest', {
           donor_id: selectedRequest.donor_id,
           organisation_id: localStorage.getItem("organizations_id")
         });
@@ -230,7 +230,7 @@ const PickupRequests = () => {
   const confirmDecline = async () => {
     if (selectedRequest) {
       try {
-        const response = await axios.post('https://nnr0wds4-8000.inc1.devtunnels.ms/declineRequest', {
+        const response = await axios.post('https://classical-lorinda-blaaaaug-8f2c0766.koyeb.app/declineRequest', {
           donor_id: selectedRequest.donor_id,
           organisation_id: localStorage.getItem("organizations_id")
         });

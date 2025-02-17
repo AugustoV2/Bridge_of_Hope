@@ -23,7 +23,7 @@ const OrganizationRegistration = () => {
 
     try {
       // Send the form data to the API
-      const response = await axios.post('https://nnr0wds4-8000.inc1.devtunnels.ms/oraganisationDetails', {
+      const response = await axios.post('https://classical-lorinda-blaaaaug-8f2c0766.koyeb.app/oraganisationDetails', {
         organizationName: formData.organizationName,
         registrationNumber: formData.registrationNumber,
         address: formData.address,

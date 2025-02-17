@@ -19,7 +19,7 @@ const OrgHome = () => {
     const fetchData = async () => {
       try {
         const organizations_id = localStorage.getItem('organizations_id');
-        const response = await axios.get(`https://nnr0wds4-8000.inc1.devtunnels.ms/organisationdetails?organizations_id=${organizations_id}`);
+        const response = await axios.get(`https://classical-lorinda-blaaaaug-8f2c0766.koyeb.app/organisationdetails?organizations_id=${organizations_id}`);
         if (response.status === 200 && response.data) {
           setOrgData({
             ...response.data,
