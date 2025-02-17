@@ -2,10 +2,10 @@ import { useState, useRef } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { ArrowLeft, Camera, Upload, CheckCircle, Copy, Maximize, Minimize } from 'lucide-react';
+import axios from 'axios';
 
-import { GoogleGenerativeAI } from '@google/generative-ai';
 
-const genAI = new GoogleGenerativeAI(import.meta.env.VITE_GEMINI_API_KEY);
+
 
 interface ItemCondition {
   label: string;
@@ -71,10 +71,11 @@ const DonationItemDetails = () => {
 
     setAnalyzing(true);
     try {
-      const model = genAI.getGenerativeModel({ model: "models/gemini-1.5-pro-latest" });
-      const result = await model.generateContent(image);
-      const response = await result.response;
-      setApiResponse(response.text()); // Set the API response
+      const response = await axios.post('https://nnr0wds4-8000.inc1.devtunnels.ms/imageupload', {
+        image,
+      });
+      setApiResponse(response.data.description); 
+    
     } catch (error) {
       setApiResponse('Error analyzing image: ' + (error as Error).message);
     } finally {
