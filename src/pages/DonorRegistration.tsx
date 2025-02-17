@@ -15,7 +15,7 @@ const DonorRegistration = () => {
     donationPreferences: [] as string[],
   });
 
-  const donationTypes = ['Monetary', 'Food', 'Clothing', 'Medical Supplies', 'Educational Materials'];
+  const donationTypes = [ 'Food', 'Clothing', 'Medical Supplies', 'Educational Materials'];
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -78,17 +78,22 @@ const DonorRegistration = () => {
             <div>
               <label htmlFor="phoneNumber" className="block text-sm font-medium text-gray-700">Phone Number</label>
               <div className="mt-1 relative rounded-md shadow-sm">
-                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                  <Phone className="h-5 w-5 text-gray-400" />
-                </div>
-                <input
-                  type="tel"
-                  id="phoneNumber"
-                  required
-                  value={formData.phoneNumber}
-                  onChange={(e) => setFormData((prev) => ({ ...prev, phoneNumber: e.target.value }))}
-                  className="block w-full pl-10 sm:text-sm border-gray-300 rounded-md focus:ring-rose-500 focus:border-rose-500"
-                />
+              <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                <Phone className="h-5 w-5 text-gray-400" />
+              </div>
+              <input
+                type="tel"
+                id="phoneNumber"
+                required
+                value={formData.phoneNumber}
+                onChange={(e) => {
+                const value = e.target.value;
+                if (/^\d{0,10}$/.test(value)) {
+                  setFormData((prev) => ({ ...prev, phoneNumber: value }));
+                }
+                }}
+                className="block w-full pl-10 sm:text-sm border-gray-300 rounded-md focus:ring-rose-500 focus:border-rose-500"
+              />
               </div>
             </div>
 

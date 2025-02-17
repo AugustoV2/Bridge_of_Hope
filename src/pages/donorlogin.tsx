@@ -16,7 +16,7 @@ const DonorLogin = () => {
     setIsLoading(true);
 
     try {
-      const response = await axios.post('https://classical-lorinda-blaaaaug-8f2c0766.koyeb.app/login', {
+      const response = await axios.post('https://nnr0wds4-8000.inc1.devtunnels.ms/login', {
         email,
         password,
         user_type: 'donor',
@@ -29,7 +29,7 @@ const DonorLogin = () => {
       } 
       else if (response.data.message === 'Login successful' && response.data.Details === 'No') {
         localStorage.setItem('donor_id', response.data.donor_id);
-        navigate('/donor');
+        navigate('/register/donor');
       }
     } catch (error: any) {
       toast.error(error.response?.data?.message || 'Login failed. Please try again.');
@@ -43,15 +43,16 @@ const DonorLogin = () => {
     setIsLoading(true);
 
     try {
-      const response = await axios.post('https://classical-lorinda-blaaaaug-8f2c0766.koyeb.app/register', {
+      const response = await axios.post('https://nnr0wds4-8000.inc1.devtunnels.ms/register', {
         email,
         password,
         user_type: 'donor',
       });
 
-      if (response.data.user) {
+      if (response.data.message === 'Registration successful') {
+        localStorage.setItem('donor_id', response.data.donor_id);
         toast.success('Account created successfully! Please check your email for verification.');
-        navigate('/donor');
+        navigate('/register/donor');
       }
     } catch (error: any) {
       toast.error(error.response?.data?.message || 'Signup failed. Please try again.');

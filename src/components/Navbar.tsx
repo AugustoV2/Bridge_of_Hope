@@ -23,12 +23,14 @@ const Navbar = () => {
           </div>
 
 
-          <div className="hidden md:flex items-center space-x-8">
+            <div className="hidden md:flex items-center space-x-8">
             <NavLink to="/" icon={<Home size={18} />} text="Home" isActive={isActive('/')} />
             <NavLink to="/about" icon={<Info size={18} />} text="About" isActive={isActive('/about')} />
             <NavLink to="/contact" icon={<MessageCircle size={18} />} text="Contact" isActive={isActive('/contact')} />
-            <NavLink to="/login" icon={<LogIn size={18} />} text="Login" isActive={isActive('/login')} />
-          </div>
+            {!(localStorage.getItem('donor_id') || localStorage.getItem('organizations_id')) && (
+              <NavLink to="/login" icon={<LogIn size={18} />} text="Login" isActive={isActive('/login')} />
+            )}
+            </div>
         </div>
       </div>
     </nav>

@@ -19,7 +19,7 @@ export async function generateResponse(userInput: string): Promise<string> {
     AI:`;
 
     // Use a fallback model
-    const model = genAI.getGenerativeModel({ model: "gemini-pro" });
+    const model = genAI.getGenerativeModel({ model: "gemini-2.0-flash" });
 
     const result = await model.generateContent(customPrompt);
     const response = await result.response;

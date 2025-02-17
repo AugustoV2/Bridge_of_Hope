@@ -1,4 +1,4 @@
-import React from 'react';
+
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import { Toaster } from 'react-hot-toast';
 import Navbar from './components/Navbar';
@@ -13,6 +13,7 @@ import OrganisationLogin from './pages/organisationlogin';
 import OrgHome from './pages/Orghome';
 import OrgPickups from './pages/OrgPickups';
 import DonationItemDetails from './pages/DonateitemDetails';
+import DonationConfirmation from './pages/DonationConfirmation';
 
 function App() {
   return (
@@ -32,6 +33,7 @@ function App() {
             <Route path="/OrgHome" element={<OrgHome />} />
             <Route path="/orgpickups" element={<OrgPickups />} />
             <Route path="/item/:id" element={<DonationItemDetails />} />
+            <Route path="/donation-confirmation" element={< DonationConfirmation/>} />
 
 
 

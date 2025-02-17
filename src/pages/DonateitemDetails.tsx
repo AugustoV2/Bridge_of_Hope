@@ -92,7 +92,7 @@ const DonationItemDetails = () => {
     setIsSubmitting(true);
 
     try {
-      id === '1' ? 'winterclothes' : id === '2' ? 'Non-perishable Food'  : id === '3' ? 'School Supplies' : id === '4' ? 'Hygiene Products' : id === '5' ? 'Baby Supplies' : id === '6' ? 'Toys' : id === '7' ? 'other' : 'other';
+     
       const response = await fetch('https://classical-lorinda-blaaaaug-8f2c0766.koyeb.app/donations', {
         method: 'POST',
         headers: {
@@ -106,6 +106,8 @@ const DonationItemDetails = () => {
           donation_date: new Date().toISOString(), 
           Additional_Notes:notes,
           image:image || '',
+          apiResponse,
+          itemname: id === '1' ? 'Winter Coats' : id === '2' ? 'Non-perishable Food'  : id === '3' ? 'School Supplies' : id === '4' ? 'Hygiene Products' : id === '5' ? 'Baby Supplies' : id === '6' ? 'Books' : id === '7' ? 'other' : 'other',
          
           
           

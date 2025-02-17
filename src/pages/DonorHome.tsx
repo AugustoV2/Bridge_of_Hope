@@ -49,7 +49,7 @@ const DonorHome = () => {
         setDonorData(response.data || dummyData);
       } catch (err) {
         setDonorData(dummyData);
-        setError('Failed to fetch donor data. Displaying default values.');
+       
       } finally {
         setLoading(false);
       }

@@ -3,7 +3,8 @@ import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { Building2, FileText, MapPin, User } from 'lucide-react';
 import toast from 'react-hot-toast';
-import { supabase } from '../lib/supabase';
+import axios from 'axios';
+
 
 const OrganizationRegistration = () => {
   const navigate = useNavigate();
@@ -13,40 +14,36 @@ const OrganizationRegistration = () => {
     registrationNumber: '',
     address: '',
     headName: '',
+    organisation_id: localStorage.getItem('organization_id'),
   });
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
 
-    navigate('/dashboard/organization');
+    try {
+      // Send the form data to the API
+      const response = await axios.post('https://nnr0wds4-8000.inc1.devtunnels.ms/oraganisationDetails', {
+        organizationName: formData.organizationName,
+        registrationNumber: formData.registrationNumber,
+        address: formData.address,
+        headName: formData.headName,
+        organizations_id: localStorage.getItem('organizations_id'),
+      });
 
-    // try {
-    //   const { data: { user } } = await supabase.auth.getUser();
       
-    //   if (!user) throw new Error('No authenticated user found');
 
-    //   const { error } = await supabase
-    //     .from('organization_profiles')
-    //     .insert([
-    //       {
-    //         user_id: user.id,
-    //         organization_name: formData.organizationName,
-    //         registration_number: formData.registrationNumber,
-    //         address: formData.address,
-    //         head_name: formData.headName,
-    //       },
-    //     ]);
+      // if (response.status !== 200) {
+      //   throw new Error(data.message || 'Failed to submit organization details');
+      // }
 
-    //   if (error) throw error;
-
-    //   toast.success('Organization profile created! Awaiting verification.');
-    //   navigate('/dashboard/organization');
-    // } catch (error: any) {
-    //   toast.error(error.message);
-    // } finally {
-    //   setIsLoading(false);
-    // }
+      toast.success('Organization profile created! Awaiting verification.');
+      navigate('/OrgHome');
+    } catch (error: any) {
+      toast.error(error.message);
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (

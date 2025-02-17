@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { Mail, Lock, Building2 } from 'lucide-react';
 import toast from 'react-hot-toast';
-import { supabase } from '../lib/supabase';
+import axios from 'axios';
 
 const OrganizationLogin = () => {
   const navigate = useNavigate();
@@ -16,14 +16,25 @@ const OrganizationLogin = () => {
     setIsLoading(true);
 
     try {
-      const { data: { user }, error } = await supabase.auth.signInWithPassword({
-        email,
-        password,
+      const response = await axios.post('https://classical-lorinda-blaaaaug-8f2c0766.koyeb.app/login', {
+      email,
+      password,
       });
 
-      if (error) throw error;
+      const data = await response.data;
 
-      if (user) {
+      if (response.status !== 200) {
+        throw new Error(data.message || 'Login failed');
+      }
+      if (response.data.message === 'Login successful' && response.data.Details === 'Yes') {
+        console.log(data.organizations_id);
+        
+        localStorage.setItem('organizations_id', data.organizations_id);
+        navigate('/OrgHome');
+       
+      }
+      else if(response.data.message === 'Login successful' && response.data.Details === 'No'){
+        localStorage.setItem('organizations_id', data.organizations_id);
         navigate('/register/organization');
       }
     } catch (error: any) {
@@ -38,29 +49,23 @@ const OrganizationLogin = () => {
     setIsLoading(true);
 
     try {
-      const { data: { user }, error } = await supabase.auth.signUp({
+      const response = await axios.post('https://nnr0wds4-8000.inc1.devtunnels.ms/register', {
         email,
         password,
+        user_type: 'organization',
+
+       
       });
 
-      if (error) throw error;
+      const data = await response.data;
 
-      if (user) {
-        const { error: profileError } = await supabase
-          .from('users')
-          .insert([
-            {
-              id: user.id,
-              email: user.email,
-              user_type: 'organization',
-            },
-          ]);
-
-        if (profileError) throw profileError;
-
-        toast.success('Account created successfully! Please check your email for verification.');
-        navigate('/register/organization');
+      if (response.status !== 200) {
+        throw new Error(data.message || 'Sign up failed');
       }
+
+      toast.success('Account created successfully! Please check your email for verification.');
+      localStorage.setItem('organization_id', data.organization_id);
+      navigate('/register/organization');
     } catch (error: any) {
       toast.error(error.message);
     } finally {
