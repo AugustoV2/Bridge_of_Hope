@@ -71,7 +71,7 @@ const DonationItemDetails = () => {
 
     setAnalyzing(true);
     try {
-      const response = await axios.post('https://nnr0wds4-8000.inc1.devtunnels.ms/imageupload', {
+      const response = await axios.post('https://classical-lorinda-blaaaaug-8f2c0766.koyeb.app/imageupload', {
         image,
       });
       setApiResponse(response.data.description); 
