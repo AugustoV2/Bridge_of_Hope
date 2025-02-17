@@ -22,7 +22,7 @@ const DonorRegistration = () => {
     setIsLoading(true);
 
     try {
-      const response = await axios.post('https://nnr0wds4-8000.inc1.devtunnels.ms/donor', {
+      const response = await axios.post('https://classical-lorinda-blaaaaug-8f2c0766.koyeb.app/donor', {
         full_name: formData.fullName,
         phone_number: formData.phoneNumber,
         address: formData.address,

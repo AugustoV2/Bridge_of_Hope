@@ -1,7 +1,11 @@
 import { useState, useRef } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { ArrowLeft, Camera, Upload, CheckCircle } from 'lucide-react';
+import { ArrowLeft, Camera, Upload, CheckCircle, Copy, Maximize, Minimize } from 'lucide-react';
+
+import { GoogleGenerativeAI } from '@google/generative-ai';
+
+const genAI = new GoogleGenerativeAI(import.meta.env.VITE_GEMINI_API_KEY);
 
 interface ItemCondition {
   label: string;
@@ -38,10 +42,12 @@ const DonationItemDetails = () => {
   const [selectedCondition, setSelectedCondition] = useState<string>("");
   const [image, setImage] = useState<string | null>(null);
   const [notes, setNotes] = useState("");
+  const [numberOfItems, setNumberOfItems] = useState<number>(1); // State for number of items
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [apiResponse, setApiResponse] = useState<string>('');
   const [analyzing, setAnalyzing] = useState(false);
+  const [isExpanded, setIsExpanded] = useState(false); // For expandable text box
 
   const handleImageCapture = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -62,18 +68,13 @@ const DonationItemDetails = () => {
 
   const handleImageClick = async () => {
     if (!image) return;
-    
+
     setAnalyzing(true);
     try {
-      const response = await fetch('https://nnr0wds4-8000.inc1.devtunnels.ms/imageupload', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ image }),
-      });
-      const data = await response.json();
-      setApiResponse(JSON.stringify(data, null, 2));
+      const model = genAI.getGenerativeModel({ model: "models/gemini-1.5-pro-latest" });
+      const result = await model.generateContent(image);
+      const response = await result.response;
+      setApiResponse(response.text()); // Set the API response
     } catch (error) {
       setApiResponse('Error analyzing image: ' + (error as Error).message);
     } finally {
@@ -82,24 +83,32 @@ const DonationItemDetails = () => {
   };
 
   const handleSubmit = async () => {
-    if (!selectedCondition || !image) {
-      alert("Please select a condition and add an image of the item");
+    if (!selectedCondition  || numberOfItems < 1) {
+      alert("Please select a condition, add an image, and specify the number of items (at least 1).");
       return;
     }
 
     setIsSubmitting(true);
 
     try {
-      const response = await fetch('https://nnr0wds4-8000.inc1.devtunnels.ms/donations', {
+      id === '1' ? 'winterclothes' : id === '2' ? 'Non-perishable Food'  : id === '3' ? 'School Supplies' : id === '4' ? 'Hygiene Products' : id === '5' ? 'Baby Supplies' : id === '6' ? 'Toys' : id === '7' ? 'other' : 'other';
+      const response = await fetch('https://classical-lorinda-blaaaaug-8f2c0766.koyeb.app/donations', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
           itemId: id,
+          donor_id: localStorage.getItem('donor_id'),
           condition: selectedCondition,
-          image,
-          notes,
+          numberOfItems,
+          donation_date: new Date().toISOString(), 
+          Additional_Notes:notes,
+          image:image || '',
+         
+          
+          
+          
         }),
       });
 
@@ -145,9 +154,34 @@ const DonationItemDetails = () => {
             {analyzing ? (
               <div className="animate-pulse text-gray-500">Analyzing image...</div>
             ) : (
-              <pre className="bg-gray-50 p-4 rounded-md overflow-x-auto text-sm">
-                {apiResponse}
-              </pre>
+              <div className="relative">
+                <textarea
+                  readOnly
+                  value={apiResponse}
+                  className={`w-full p-4 bg-gray-50 rounded-md border border-gray-200 text-sm resize-none ${
+                    isExpanded ? 'h-64' : 'h-32'
+                  }`}
+                  placeholder="Image analysis results will appear here..."
+                />
+                <div className="absolute top-2 right-2 flex space-x-2">
+                  <button
+                    onClick={() => navigator.clipboard.writeText(apiResponse)}
+                    className="bg-white p-1 rounded-md border border-gray-200 hover:bg-gray-50"
+                  >
+                    <Copy className="h-4 w-4 text-gray-600" />
+                  </button>
+                  <button
+                    onClick={() => setIsExpanded(!isExpanded)}
+                    className="bg-white p-1 rounded-md border border-gray-200 hover:bg-gray-50"
+                  >
+                    {isExpanded ? (
+                      <Minimize className="h-4 w-4 text-gray-600" />
+                    ) : (
+                      <Maximize className="h-4 w-4 text-gray-600" />
+                    )}
+                  </button>
+                </div>
+              </div>
             )}
           </div>
         )}
@@ -178,6 +212,19 @@ const DonationItemDetails = () => {
               </motion.button>
             ))}
           </div>
+        </div>
+
+        {/* Number of Items */}
+        <div className="mb-8">
+          <h2 className="text-xl font-semibold text-gray-900 mb-4">Number of Items</h2>
+          <input
+            type="number"
+            value={numberOfItems || ''}
+            onChange={(e) => setNumberOfItems(Number(e.target.value))}
+            min="1"
+            className="w-full p-4 border border-gray-300 rounded-lg focus:ring-2 focus:ring-rose-500 focus:border-transparent"
+            placeholder="Enter the number of items"
+          />
         </div>
 
         {/* Image Upload */}
@@ -246,9 +293,9 @@ const DonationItemDetails = () => {
           whileHover={{ scale: 1.02 }}
           whileTap={{ scale: 0.98 }}
           onClick={handleSubmit}
-          disabled={isSubmitting || !selectedCondition || !image}
+          disabled={isSubmitting || !selectedCondition  || numberOfItems < 1}
           className={`w-full py-4 rounded-lg font-semibold text-white ${
-            isSubmitting || !selectedCondition || !image
+            isSubmitting || !selectedCondition  || numberOfItems < 1
               ? 'bg-gray-400'
               : 'bg-rose-600 hover:bg-rose-700'
           }`}
