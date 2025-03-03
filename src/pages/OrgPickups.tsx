@@ -208,7 +208,7 @@ const PickupRequests: React.FC = () => {
   const confirmAccept = async () => {
     if (selectedRequest && selectedPickupDate && selectedPickupTime) {
       try {
-        const response = await axios.post('https://classical-lorinda-blaaaaug-8f2c0766.koyeb.app/acceptRequest', {
+        const response = await axios.post('http://127.0.0.1:8000/acceptRequestorg', {
           donor_id: selectedRequest.donor_id,
           organisation_id: localStorage.getItem("organizations_id"),
           pickup_date: selectedPickupDate,

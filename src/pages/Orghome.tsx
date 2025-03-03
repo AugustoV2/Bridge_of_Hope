@@ -82,7 +82,7 @@ const OrgHome = () => {
               <Truck className="h-8 w-8 text-blue-500" />
               <div className="ml-4">
                 <p className="text-sm font-medium text-gray-500">Total Pickups</p>
-                <p className="text-2xl font-semibold text-gray-900">{orgData.Total_Pickups}</p>
+                <p className="text-2xl font-semibold text-gray-900">10</p>
               </div>
             </div>
           </motion.div>
@@ -92,7 +92,7 @@ const OrgHome = () => {
               <Clock className="h-8 w-8 text-blue-500" />
               <div className="ml-4">
                 <p className="text-sm font-medium text-gray-500">Pending Pickups</p>
-                <p className="text-2xl font-semibold text-gray-900">{orgData.Pending_Pickups}</p>
+                <p className="text-2xl font-semibold text-gray-900">5</p>
               </div>
             </div>
           </motion.div>
@@ -112,7 +112,7 @@ const OrgHome = () => {
               <TrendingUp className="h-8 w-8 text-blue-500" />
               <div className="ml-4">
                 <p className="text-sm font-medium text-gray-500">Success Rate</p>
-                <p className="text-2xl font-semibold text-gray-900">{orgData.successRate}%</p>
+                <p className="text-2xl font-semibold text-gray-900">34%</p>
               </div>
             </div>
           </motion.div>

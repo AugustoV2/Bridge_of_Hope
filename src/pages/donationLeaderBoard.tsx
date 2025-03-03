@@ -157,9 +157,15 @@ const DonationLeaderboard: React.FC = () => {
                 index === 0 ? 'ring-4 ring-yellow-400' : ''
               }`}
             >
-              <div className="relative">
+                <div className="relative">
                 <img
-                  src={donor.avatar || 'https://www.thedigitalspeaker.com/content/images/2022/07/Five-NFT-Challenges.webp'} // Fallback avatar
+                  src={
+                  index === 0
+                    ? 'https://www.thedigitalspeaker.com/content/images/2022/07/Five-NFT-Challenges.webp'
+                    : index === 1
+                    ? 'https://substackcdn.com/image/fetch/f_auto,q_auto:good,fl_progressive:steep/https%3A%2F%2Fbucketeer-e05bbc84-baa3-437e-9518-adb32be77984.s3.amazonaws.com%2Fpublic%2Fimages%2F52c18f05-0251-463f-8128-8add0c4ee71c_600x600.png'
+                    : 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcS-jK1yE4CbW9NEKYqQD20duOv1xPiPKsQqEg&s'
+                  }
                   alt={donor.full_name}
                   className="w-24 h-24 rounded-full object-cover border-4 border-white shadow-lg"
                 />
@@ -244,7 +250,22 @@ const DonationLeaderboard: React.FC = () => {
                     <div className="flex-shrink-0 h-10 w-10">
                       <img
                         className="h-10 w-10 rounded-full object-cover"
-                        src={donor.avatar || 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQu-uAmNLuM06LPXnnIXl_GClwJRDoJ_JnYvQ&s'}
+                        src={
+                          donor.avatar ||
+                          (index === 0
+                            ? 'https://www.thedigitalspeaker.com/content/images/2022/07/Five-NFT-Challenges.webp'
+                            : index === 1
+                            ? 'https://substackcdn.com/image/fetch/f_auto,q_auto:good,fl_progressive:steep/https%3A%2F%2Fbucketeer-e05bbc84-baa3-437e-9518-adb32be77984.s3.amazonaws.com%2Fpublic%2Fimages%2F52c18f05-0251-463f-8128-8add0c4ee71c_600x600.png'
+                            : index === 2
+                            ? 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcS-jK1yE4CbW9NEKYqQD20duOv1xPiPKsQqEg&s'
+                            : index === 3
+                            ? 'https://www.cnet.com/a/img/resize/7589227193923c006f9a7fd904b77bc898e105ff/hub/2021/11/29/f566750f-79b6-4be9-9c32-8402f58ba0ef/richerd.png?auto=webp&width=768'
+                            : index === 4
+                            ? 'https://preview.redd.it/how-do-i-get-my-money-back-for-delisted-nfts-v0-60k5r5a8tahc1.jpeg?width=640&crop=smart&auto=webp&s=16fcc84e362a598fbf1ee0688b9c9a892cfb20d0'
+                            : index === 5
+                            ? 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcR40ZNzQtPmAVIQrW877zVGSTjzDBe5Pt_RDg&s'
+                            : 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcS-e06Fw9P4JgtHo6u6tHZBn6-Ke4ecxwxeXg&s')
+                        }
                         alt={donor.full_name}
                       />
                     </div>

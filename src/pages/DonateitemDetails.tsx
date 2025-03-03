@@ -45,6 +45,7 @@ const DonationItemDetails = () => {
   const [numberOfItems, setNumberOfItems] = useState<number>(1); // State for number of items
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [city, setCity] = useState<string>('');
   const [apiResponse, setApiResponse] = useState<string>('');
   const [analyzing, setAnalyzing] = useState(false);
   const [isExpanded, setIsExpanded] = useState(false); // For expandable text box
@@ -215,6 +216,17 @@ const DonationItemDetails = () => {
               </motion.button>
             ))}
           </div>
+        </div>
+
+        <div className="mb-8">
+          <h2 className="text-xl font-semibold text-gray-900 mb-4">City</h2>
+          <input
+            type="text"
+            value={city}
+            onChange={(e) => setCity(e.target.value)}
+            className="w-full p-4 border border-gray-300 rounded-lg focus:ring-2 focus:ring-rose-500 focus:border-transparent"
+            placeholder="Enter your city"
+          />
         </div>
 
         {/* Number of Items */}
