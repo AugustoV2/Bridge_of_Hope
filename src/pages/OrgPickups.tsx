@@ -14,6 +14,7 @@ interface PickupRequest {
   response: string;
   itemname: string;
   status?: string;
+  pickup_date?: string;
   pickup_time?: string;
 }
 
@@ -116,7 +117,7 @@ const TabButton = ({
   </button>
 );
 
-const PickupRequests = () => {
+const PickupRequests: React.FC = () => {
   const navigate = useNavigate();
   const [pickupRequests, setPickupRequests] = useState<PickupRequest[]>([]);
   const [donorDetails, setDonorDetails] = useState<{ [key: string]: DonorDetails }>({});
@@ -125,6 +126,7 @@ const PickupRequests = () => {
   const [selectedRequest, setSelectedRequest] = useState<PickupRequest | null>(null);
   const [showAcceptModal, setShowAcceptModal] = useState(false);
   const [activeTab, setActiveTab] = useState<TabType>('active');
+  const [selectedPickupDate, setSelectedPickupDate] = useState<string>('');
   const [selectedPickupTime, setSelectedPickupTime] = useState<string>('');
 
   // Available pickup time slots
@@ -196,26 +198,27 @@ const PickupRequests = () => {
     accepted: pickupRequests.filter(r => r.status === 'accepted').length,
   };
 
-  
   const handleAccept = (request: PickupRequest) => {
     setSelectedRequest(request);
+    setSelectedPickupDate(''); // Reset selected date
     setSelectedPickupTime(''); // Reset selected time
     setShowAcceptModal(true);
   };
 
   const confirmAccept = async () => {
-    if (selectedRequest && selectedPickupTime) {
+    if (selectedRequest && selectedPickupDate && selectedPickupTime) {
       try {
         const response = await axios.post('https://classical-lorinda-blaaaaug-8f2c0766.koyeb.app/acceptRequest', {
           donor_id: selectedRequest.donor_id,
           organisation_id: localStorage.getItem("organizations_id"),
+          pickup_date: selectedPickupDate,
           pickup_time: selectedPickupTime
         });
         if (response.status === 200) {
           setPickupRequests(prevRequests => 
             prevRequests.map(request => 
               request.donor_id === selectedRequest.donor_id 
-                ? { ...request, status: 'accepted', pickup_time: selectedPickupTime } // Update status to 'accepted' with pickup time
+                ? { ...request, status: 'accepted', pickup_date: selectedPickupDate, pickup_time: selectedPickupTime } 
                 : request
             )
           );
@@ -355,7 +358,7 @@ const PickupRequests = () => {
                             {request.pickup_time && (
                               <div className="flex items-center text-gray-600">
                                 <Calendar className="h-5 w-5 mr-3 text-emerald-500" />
-                                <span className="font-medium text-emerald-600">Pickup scheduled: {request.pickup_time}</span>
+                                <span className="font-medium text-emerald-600">Pickup scheduled: {request.pickup_date} at {request.pickup_time}</span>
                               </div>
                             )}
                           </div>
@@ -400,11 +403,23 @@ const PickupRequests = () => {
             {selectedRequest && (
               <div>
                 <div className="space-y-6 mb-8">
-              
-                  
                   <div className="p-6 bg-blue-50 rounded-2xl border border-blue-100">
                     <h4 className="font-bold text-blue-800 mb-4 text-lg flex items-center">
                       <Calendar className="h-5 w-5 mr-2" />
+                      Select Pickup Date
+                    </h4>
+                    <input
+                      type="date"
+                      value={selectedPickupDate}
+                      onChange={(e) => setSelectedPickupDate(e.target.value)}
+                      className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500"
+                      min={new Date().toISOString().split('T')[0]} // Prevent selecting past dates
+                    />
+                  </div>
+
+                  <div className="p-6 bg-blue-50 rounded-2xl border border-blue-100">
+                    <h4 className="font-bold text-blue-800 mb-4 text-lg flex items-center">
+                      <Clock className="h-5 w-5 mr-2" />
                       Select Pickup Time
                     </h4>
                     <div className="space-y-3">
@@ -448,9 +463,9 @@ const PickupRequests = () => {
                   </button>
                   <button
                     onClick={confirmAccept}
-                    disabled={!selectedPickupTime}
+                    disabled={!selectedPickupDate || !selectedPickupTime}
                     className={`px-8 py-3 rounded-xl shadow-lg hover:shadow-xl font-medium ${
-                      selectedPickupTime 
+                      selectedPickupDate && selectedPickupTime
                         ? 'bg-emerald-500 text-white hover:bg-emerald-600 transition-colors' 
                         : 'bg-gray-300 text-gray-500 cursor-not-allowed'
                     }`}
