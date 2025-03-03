@@ -27,6 +27,7 @@ const Navbar = () => {
             <NavLink to="/" icon={<Home size={18} />} text="Home" isActive={isActive('/')} />
             <NavLink to="/about" icon={<Info size={18} />} text="About" isActive={isActive('/about')} />
             <NavLink to="/contact" icon={<MessageCircle size={18} />} text="Contact" isActive={isActive('/contact')} />
+            <NavLink to="/LeaderBoard" icon={<MessageCircle size={18} />} text="Leader Board" isActive={isActive('/LeaderBoard')} />
             {!(localStorage.getItem('donor_id') || localStorage.getItem('organizations_id')) && (
               <NavLink to="/login" icon={<LogIn size={18} />} text="Login" isActive={isActive('/login')} />
             )}

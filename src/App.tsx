@@ -14,6 +14,7 @@ import OrgHome from './pages/Orghome';
 import OrgPickups from './pages/OrgPickups';
 import DonationItemDetails from './pages/DonateitemDetails';
 import DonationConfirmation from './pages/DonationConfirmation';
+import LeaderBoard from './pages/donationLeaderBoard';
 
 function App() {
   return (
@@ -34,6 +35,7 @@ function App() {
             <Route path="/orgpickups" element={<OrgPickups />} />
             <Route path="/item/:id" element={<DonationItemDetails />} />
             <Route path="/donation-confirmation" element={< DonationConfirmation/>} />
+            <Route path="/LeaderBoard" element={<LeaderBoard />} />
 
 
 
