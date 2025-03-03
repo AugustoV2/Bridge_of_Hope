@@ -218,17 +218,34 @@ const DonationItemDetails = () => {
         </div>
 
         {/* Number of Items */}
-        <div className="mb-8">
-          <h2 className="text-xl font-semibold text-gray-900 mb-4">Number of Items</h2>
-          <input
-            type="number"
-            value={numberOfItems || ''}
-            onChange={(e) => setNumberOfItems(Number(e.target.value))}
-            min="1"
-            className="w-full p-4 border border-gray-300 rounded-lg focus:ring-2 focus:ring-rose-500 focus:border-transparent"
-            placeholder="Enter the number of items"
-          />
-        </div>
+        {id !== '1' && (
+          <div className="mb-8">
+            <h2 className="text-xl font-semibold text-gray-900 mb-4">Number of Items</h2>
+            <input
+              type="number"
+              value={numberOfItems || ''}
+              onChange={(e) => setNumberOfItems(Number(e.target.value))}
+              min="1"
+              className="w-full p-4 border border-gray-300 rounded-lg focus:ring-2 focus:ring-rose-500 focus:border-transparent"
+              placeholder="Enter the number of items"
+            />
+          </div>
+        )}
+        {id === '1' && (
+           <div className="mb-8">
+           <h2 className="text-xl font-semibold text-gray-900 mb-4">Amount in Kg</h2>
+           <input
+             type="number"
+             value={numberOfItems || ''}
+             onChange={(e) => setNumberOfItems(Number(e.target.value))}
+             min="1"
+             className="w-full p-4 border border-gray-300 rounded-lg focus:ring-2 focus:ring-rose-500 focus:border-transparent"
+             placeholder="Enter the number of items"
+           />
+         </div>
+          
+
+        )}
 
         {/* Image Upload */}
         <div className="mb-8">

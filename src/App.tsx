@@ -15,6 +15,7 @@ import OrgPickups from './pages/OrgPickups';
 import DonationItemDetails from './pages/DonateitemDetails';
 import DonationConfirmation from './pages/DonationConfirmation';
 import LeaderBoard from './pages/donationLeaderBoard';
+import History from './pages/DonationHistory'
 
 function App() {
   return (
@@ -36,6 +37,7 @@ function App() {
             <Route path="/item/:id" element={<DonationItemDetails />} />
             <Route path="/donation-confirmation" element={< DonationConfirmation/>} />
             <Route path="/LeaderBoard" element={<LeaderBoard />} />
+            <Route path="/History" element={<History />} />
 
 
 

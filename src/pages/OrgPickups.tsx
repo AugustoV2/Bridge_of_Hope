@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { ArrowLeft, MapPin, Package, Calendar, X, AlertCircle, Users, Clock, CheckCircle2, XCircle, MessageSquare, Inbox, CheckCircle, Ban } from 'lucide-react';
+import { ArrowLeft, MapPin, Package, Calendar, X, AlertCircle, Users, Clock, CheckCircle2, MessageSquare, Inbox, CheckCircle } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 
@@ -14,6 +14,7 @@ interface PickupRequest {
   response: string;
   itemname: string;
   status?: string;
+  pickup_time?: string;
 }
 
 interface DonorDetails {
@@ -28,7 +29,7 @@ interface ModalProps {
   title: string;
 }
 
-type TabType = 'active' | 'accepted' | 'declined';
+type TabType = 'active' | 'accepted';
 
 const Modal: React.FC<ModalProps> = ({ isOpen, onClose, children, title }) => {
   if (!isOpen) return null;
@@ -123,8 +124,17 @@ const PickupRequests = () => {
   const [error, setError] = useState<string | null>(null);
   const [selectedRequest, setSelectedRequest] = useState<PickupRequest | null>(null);
   const [showAcceptModal, setShowAcceptModal] = useState(false);
-  const [showDeclineModal, setShowDeclineModal] = useState(false);
   const [activeTab, setActiveTab] = useState<TabType>('active');
+  const [selectedPickupTime, setSelectedPickupTime] = useState<string>('');
+
+  // Available pickup time slots
+  const pickupTimeSlots = [
+    '9:00 AM - 11:00 AM',
+    '11:00 AM - 1:00 PM',
+    '1:00 PM - 3:00 PM',
+    '3:00 PM - 5:00 PM',
+    '5:00 PM - 7:00 PM'
+  ];
 
   useEffect(() => {
     const fetchData = async () => {
@@ -137,12 +147,8 @@ const PickupRequests = () => {
         const acceptedResponse = await axios.get('https://classical-lorinda-blaaaaug-8f2c0766.koyeb.app/req_accept');
         const acceptedData = acceptedResponse.data;
 
-        // Fetch declined requests
-        const declinedResponse = await axios.get('https://classical-lorinda-blaaaaug-8f2c0766.koyeb.app/req_decline');
-        const declinedData = declinedResponse.data;
-
         // Combine all requests
-        const allRequests = [...pickupData, ...acceptedData, ...declinedData];
+        const allRequests = [...pickupData, ...acceptedData];
 
         // Get unique donor IDs
         const donorIds = [...new Set(allRequests.map((request: PickupRequest) => request.donor_id))];
@@ -180,8 +186,6 @@ const PickupRequests = () => {
         return !request.status; // Only show requests without a status (active)
       case 'accepted':
         return request.status === 'accepted'; // Only show accepted requests
-      case 'declined':
-        return request.status === 'declined'; // Only show declined requests
       default:
         return true;
     }
@@ -190,32 +194,28 @@ const PickupRequests = () => {
   const counts = {
     active: pickupRequests.filter(r => !r.status).length,
     accepted: pickupRequests.filter(r => r.status === 'accepted').length,
-    declined: pickupRequests.filter(r => r.status === 'declined').length,
   };
 
   
   const handleAccept = (request: PickupRequest) => {
     setSelectedRequest(request);
+    setSelectedPickupTime(''); // Reset selected time
     setShowAcceptModal(true);
   };
 
-  const handleDecline = (request: PickupRequest) => {
-    setSelectedRequest(request);
-    setShowDeclineModal(true);
-  };
-
   const confirmAccept = async () => {
-    if (selectedRequest) {
+    if (selectedRequest && selectedPickupTime) {
       try {
         const response = await axios.post('https://classical-lorinda-blaaaaug-8f2c0766.koyeb.app/acceptRequest', {
           donor_id: selectedRequest.donor_id,
-          organisation_id: localStorage.getItem("organizations_id")
+          organisation_id: localStorage.getItem("organizations_id"),
+          pickup_time: selectedPickupTime
         });
         if (response.status === 200) {
           setPickupRequests(prevRequests => 
             prevRequests.map(request => 
               request.donor_id === selectedRequest.donor_id 
-                ? { ...request, status: 'accepted' } // Update status to 'accepted'
+                ? { ...request, status: 'accepted', pickup_time: selectedPickupTime } // Update status to 'accepted' with pickup time
                 : request
             )
           );
@@ -226,31 +226,6 @@ const PickupRequests = () => {
       }
     }
   };
-  
-  const confirmDecline = async () => {
-    if (selectedRequest) {
-      try {
-        const response = await axios.post('https://classical-lorinda-blaaaaug-8f2c0766.koyeb.app/declineRequest', {
-          donor_id: selectedRequest.donor_id,
-          organisation_id: localStorage.getItem("organizations_id")
-        });
-        if (response.status === 200) {
-          setPickupRequests(prevRequests => 
-            prevRequests.map(request => 
-              request.donor_id === selectedRequest.donor_id 
-                ? { ...request, status: 'declined' } // Update status to 'declined'
-                : request
-            )
-          );
-          setShowDeclineModal(false);
-        }
-      } catch (error) {
-        console.error('Error declining request:', error);
-      }
-    }
-  };
-
- 
 
   if (loading) {
     return (
@@ -317,13 +292,6 @@ const PickupRequests = () => {
             label="Accepted"
             count={counts.accepted}
           />
-          <TabButton
-            active={activeTab === 'declined'}
-            onClick={() => setActiveTab('declined')}
-            icon={Ban}
-            label="Declined"
-            count={counts.declined}
-          />
         </div>
 
         {filteredRequests.length === 0 ? (
@@ -335,9 +303,7 @@ const PickupRequests = () => {
             <p className="text-gray-600">
               {activeTab === 'active' 
                 ? "There are no pending pickup requests at the moment."
-                : activeTab === 'accepted'
-                ? "You haven't accepted any pickup requests yet."
-                : "You haven't declined any pickup requests yet."}
+                : "You haven't accepted any pickup requests yet."}
             </p>
           </div>
         ) : (
@@ -357,8 +323,6 @@ const PickupRequests = () => {
                         <div className={`rounded-2xl p-4 shadow-lg ${
                           request.response === 'accepted' 
                             ? 'bg-gradient-to-br from-emerald-500 to-emerald-600'
-                            : request.response === 'declined'
-                            ? 'bg-gradient-to-br from-red-500 to-red-600'
                             : 'bg-gradient-to-br from-blue-500 to-blue-600'
                         }`}>
                           <Package className="h-8 w-8 text-white" />
@@ -388,25 +352,24 @@ const PickupRequests = () => {
                                 day: 'numeric'
                               })}</span>
                             </div>
+                            {request.pickup_time && (
+                              <div className="flex items-center text-gray-600">
+                                <Calendar className="h-5 w-5 mr-3 text-emerald-500" />
+                                <span className="font-medium text-emerald-600">Pickup scheduled: {request.pickup_time}</span>
+                              </div>
+                            )}
                           </div>
                         </div>
                       </div>
                     </div>
                     {activeTab === 'active' && (
-                      <div className="flex items-center justify-end space-x-4 lg:border-l lg:pl-8">
+                      <div className="flex items-center justify-end lg:border-l lg:pl-8">
                         <button
                           onClick={() => handleAccept(request)}
-                          className="flex-1 px-6 py-3 bg-emerald-500 text-white rounded-xl hover:bg-emerald-600 transition-colors shadow-lg hover:shadow-xl flex items-center justify-center space-x-2"
+                          className="w-full px-6 py-3 bg-emerald-500 text-white rounded-xl hover:bg-emerald-600 transition-colors shadow-lg hover:shadow-xl flex items-center justify-center space-x-2"
                         >
                           <CheckCircle2 className="h-5 w-5" />
-                          <span>Accept</span>
-                        </button>
-                        <button
-                          onClick={() => handleDecline(request)}
-                          className="flex-1 px-6 py-3 bg-red-500 text-white rounded-xl hover:bg-red-600 transition-colors shadow-lg hover:shadow-xl flex items-center justify-center space-x-2"
-                        >
-                          <XCircle className="h-5 w-5" />
-                          <span>Decline</span>
+                          <span>Accept Request</span>
                         </button>
                       </div>
                     )}
@@ -437,37 +400,43 @@ const PickupRequests = () => {
             {selectedRequest && (
               <div>
                 <div className="space-y-6 mb-8">
-                  <div className="p-6 bg-emerald-50 rounded-2xl border border-emerald-100">
-                    <h4 className="font-bold text-emerald-800 mb-4 text-lg">Request Details</h4>
-                    <div className="space-y-3 text-emerald-700">
-                      <p className="flex items-center">
-                        <Users className="h-5 w-5 mr-3 text-emerald-500" />
-                        <span className="font-medium">Donor:</span>
-                        <span className="ml-2">{donorDetails[selectedRequest.donor_id]?.name}</span>
-                      </p>
-                      <p className="flex items-center">
-                        <Package className="h-5 w-5 mr-3 text-emerald-500" />
-                        <span className="font-medium">Item:</span>
-                        <span className="ml-2">{selectedRequest.itemname}</span>
-                      </p>
-                      <p className="flex items-center">
-                        <CheckCircle2 className="h-5 w-5 mr-3 text-emerald-500" />
-                        <span className="font-medium">Condition:</span>
-                        <span className="ml-2">{selectedRequest.condition}</span>
-                      </p>
-                      <p className="flex items-center">
-                        <Package className="h-5 w-5 mr-3 text-emerald-500" />
-                        <span className="font-medium">Quantity:</span>
-                        <span className="ml-2">{selectedRequest.number_items}</span>
-                      </p>
-                      {selectedRequest.additional_notes && (
-                        <p className="flex items-start">
-                          <MessageSquare className="h-5 w-5 mr-3 text-emerald-500 mt-1" />
-                          <span className="font-medium">Notes:</span>
-                          <span className="ml-2">{selectedRequest.additional_notes}</span>
-                        </p>
-                      )}
+              
+                  
+                  <div className="p-6 bg-blue-50 rounded-2xl border border-blue-100">
+                    <h4 className="font-bold text-blue-800 mb-4 text-lg flex items-center">
+                      <Calendar className="h-5 w-5 mr-2" />
+                      Select Pickup Time
+                    </h4>
+                    <div className="space-y-3">
+                      {pickupTimeSlots.map((timeSlot, index) => (
+                        <div key={index} className="flex items-center">
+                          <input
+                            type="radio"
+                            id={`time-${index}`}
+                            name="pickupTime"
+                            value={timeSlot}
+                            checked={selectedPickupTime === timeSlot}
+                            onChange={() => setSelectedPickupTime(timeSlot)}
+                            className="h-5 w-5 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
+                          />
+                          <label 
+                            htmlFor={`time-${index}`}
+                            className={`ml-3 block text-sm font-medium ${
+                              selectedPickupTime === timeSlot 
+                                ? 'text-blue-700 font-semibold' 
+                                : 'text-gray-700'
+                            }`}
+                          >
+                            {timeSlot}
+                          </label>
+                        </div>
+                      ))}
                     </div>
+                    {!selectedPickupTime && (
+                      <p className="mt-3 text-sm text-blue-600">
+                        Please select a pickup time to continue
+                      </p>
+                    )}
                   </div>
                 </div>
                 <div className="flex justify-end space-x-4">
@@ -479,47 +448,18 @@ const PickupRequests = () => {
                   </button>
                   <button
                     onClick={confirmAccept}
-                    className="px-8 py-3 bg-emerald-500 text-white rounded-xl hover:bg-emerald-600 transition-colors shadow-lg hover:shadow-xl font-medium"
+                    disabled={!selectedPickupTime}
+                    className={`px-8 py-3 rounded-xl shadow-lg hover:shadow-xl font-medium ${
+                      selectedPickupTime 
+                        ? 'bg-emerald-500 text-white hover:bg-emerald-600 transition-colors' 
+                        : 'bg-gray-300 text-gray-500 cursor-not-allowed'
+                    }`}
                   >
-                    Confirm Accept
+                    Confirm Pickup
                   </button>
                 </div>
               </div>
             )}
-          </Modal>
-
-          <Modal
-            isOpen={showDeclineModal}
-            onClose={() => setShowDeclineModal(false)}
-            title="Decline Pickup Request"
-          >
-            <div>
-              <div className="p-6 bg-red-50 rounded-2xl border border-red-100 mb-8">
-                <div className="flex items-start space-x-4">
-                  <AlertCircle className="h-6 w-6 text-red-500 mt-1" />
-                  <div>
-                    <h4 className="font-bold text-red-800 mb-2 text-lg">Confirm Decline</h4>
-                    <p className="text-red-700">
-                      Are you sure you want to decline this pickup request? This action cannot be undone.
-                    </p>
-                  </div>
-                </div>
-              </div>
-              <div className="flex justify-end space-x-4">
-                <button
-                  onClick={() => setShowDeclineModal(false)}
-                  className="px-6 py-3 text-gray-600 hover:text-gray-800 transition-colors font-medium"
-                >
-                  Cancel
-                </button>
-                <button
-                  onClick={confirmDecline}
-                  className="px-8 py-3 bg-red-500 text-white rounded-xl hover:bg-red-600 transition-colors shadow-lg hover:shadow-xl font-medium"
-                >
-                  Confirm Decline
-                </button>
-              </div>
-            </div>
           </Modal>
         </AnimatePresence>
       </div>

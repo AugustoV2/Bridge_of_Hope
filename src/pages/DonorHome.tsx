@@ -6,6 +6,7 @@ import axios from 'axios';
 
 const DonorHome = () => {
   const navigate = useNavigate();
+
   interface DonorData {
     full_name: string;
     totalDonations: number;
@@ -15,77 +16,97 @@ const DonorHome = () => {
     recentDonations: { month: string; items: number }[];
   }
 
+  interface ChartData {
+    month: string;
+    items: number;
+  }
+
   const [donorData, setDonorData] = useState<DonorData | null>(null);
+  const [chartData, setChartData] = useState<ChartData[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-
-  const dummyData = {
-    full_name: "John Doe",
-    totalDonations: 0,
-    itemsDonated: 0,
-    lastDonation: "N/A",
-    impactScore: 0,
-    recentDonations: [
-      { month: 'Jan', items: 2 },
-      { month: 'Feb', items: 5 },
-      { month: 'Mar', items: 3 },
-      { month: 'Apr', items: 6 },
-      { month: 'May', items: 4 },
-      { month: 'Jun', items: 7 },
-      { month: 'Jul', items: 8 },
-      { month: 'Aug', items: 5 },
-      { month: 'Sep', items: 9 },
-      { month: 'Oct', items: 6 },
-      { month: 'Nov', items: 7 },
-      { month: 'Dec', items: 10 }
-    ]
-  };
 
   useEffect(() => {
     const fetchDonorData = async () => {
       try {
         const donorId = localStorage.getItem('donor_id');
-        const response = await axios.get(`https://classical-lorinda-blaaaaug-8f2c0766.koyeb.app/donordetails?donor_id=${donorId}`);
-        setDonorData(response.data || dummyData);
+        if (!donorId) {
+          throw new Error('Donor ID not found in local storage');
+        }
+
+        const response = await axios.get(
+          `https://classical-lorinda-blaaaaug-8f2c0766.koyeb.app/donordetails?donor_id=${donorId}`
+        );
+        setDonorData(response.data);
       } catch (err) {
-        setDonorData(dummyData);
-       
+        setError(err instanceof Error ? err.message : 'Failed to fetch donor data');
       } finally {
         setLoading(false);
       }
     };
 
+    const fetchDonationHistory = async () => {
+      try {
+        const donorId = localStorage.getItem('donor_id');
+        if (!donorId) {
+          throw new Error('Donor ID not found in local storage');
+        }
+
+        const response = await axios.get(`http://127.0.0.1:8000/chart?donor_id=${donorId}`);
+        setChartData(response.data); // Update chart data state
+      } catch (err) {
+        setError(err instanceof Error ? err.message : 'Failed to fetch donation history');
+      }
+    };
+
     fetchDonorData();
+    fetchDonationHistory(); // Call fetchDonationHistory on component mount
   }, []);
 
   if (loading) {
     return <div className="text-center mt-10 text-lg">Loading...</div>;
   }
 
-  const { full_name, totalDonations, itemsDonated, lastDonation, impactScore, recentDonations } = donorData || dummyData;
-  const maxItems = Math.max(...recentDonations.map(d => d.items), 1);
+  if (!donorData) {
+    return <div className="text-center mt-10 text-lg text-red-500">No donor data available.</div>;
+  }
+
+  const { full_name, totalDonations, itemsDonated, lastDonation, impactScore } = donorData;
+  const maxItems = Math.max(...chartData.map((d) => d.items), 1); // Use chartData for maxItems
 
   return (
     <div className="min-h-screen bg-gray-50 py-8 px-4 sm:px-6 lg:px-8">
-      <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5 }} className="max-w-6xl mx-auto">
-        
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.5 }}
+        className="max-w-6xl mx-auto"
+      >
         {/* Welcome Section */}
         <div className="bg-gradient-to-r from-rose-500 to-rose-600 rounded-2xl shadow-xl p-8 mb-8">
           <div className="flex justify-between items-center">
             <div>
-              <h1 className="text-3xl font-bold text-white mb-2">
-                Welcome back, {full_name}!
-              </h1>
+              <h1 className="text-3xl font-bold text-white mb-2">Welcome back, {full_name}!</h1>
               <p className="text-rose-100">Your generosity continues to make a difference in our community.</p>
             </div>
-            <motion.button
-              whileHover={{ scale: 1.05 }}
-              whileTap={{ scale: 0.95 }}
-              onClick={() => navigate('/donateitems')}
-              className="bg-white text-rose-600 px-6 py-3 rounded-lg font-semibold shadow-md hover:shadow-lg transition-all"
-            >
-              Make a Donation
-            </motion.button>
+            <div className="flex space-x-4">
+              <motion.button
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
+                onClick={() => navigate('/donateitems')}
+                className="bg-white text-rose-600 px-6 py-3 rounded-lg font-semibold shadow-md hover:shadow-lg transition-all"
+              >
+                Make a Donation
+              </motion.button>
+              <motion.button
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
+                onClick={() => navigate('/History')}
+                className="bg-white text-rose-600 px-6 py-3 rounded-lg font-semibold shadow-md hover:shadow-lg transition-all"
+              >
+                History
+              </motion.button>
+            </div>
           </div>
         </div>
 
@@ -93,12 +114,21 @@ const DonorHome = () => {
 
         {/* Stats Grid */}
         <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4 mb-8">
-          {[{ icon: Package, label: 'Total Donations', value: totalDonations },
+          {[
+            { icon: Package, label: 'Total Donations', value: totalDonations },
             { icon: TrendingUp, label: 'Items Donated', value: itemsDonated },
-            { icon: Calendar, label: 'Last Donation', value: lastDonation !== "N/A" ? new Date(lastDonation).toLocaleDateString() : "N/A" },
-            { icon: Award, label: 'Impact Score', value: impactScore }
+            {
+              icon: Calendar,
+              label: 'Last Donation',
+              value: lastDonation !== 'N/A' ? new Date(lastDonation).toLocaleDateString() : 'N/A',
+            },
+            { icon: Award, label: 'Impact Score', value: impactScore },
           ].map(({ icon: Icon, label, value }, idx) => (
-            <motion.div key={idx} whileHover={{ scale: 1.02 }} className="bg-white rounded-xl shadow-md p-6">
+            <motion.div
+              key={idx}
+              whileHover={{ scale: 1.02 }}
+              className="bg-white rounded-xl shadow-md p-6"
+            >
               <div className="flex items-center">
                 <Icon className="h-8 w-8 text-rose-500" />
                 <div className="ml-4">
@@ -111,10 +141,15 @@ const DonorHome = () => {
         </div>
 
         {/* Donation Chart */}
-        <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.3 }} className="bg-white rounded-2xl shadow-xl p-6">
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ delay: 0.3 }}
+          className="bg-white rounded-2xl shadow-xl p-6"
+        >
           <h2 className="text-xl font-semibold text-gray-900 mb-6">Your Donation History</h2>
           <div className="h-64 flex items-end space-x-2">
-            {recentDonations.map((donation: { month: string; items: number }, index: number) => (
+            {chartData.map((donation, index) => (
               <div key={donation.month} className="flex-1 flex flex-col items-center">
                 <motion.div
                   initial={{ height: 0 }}
@@ -129,7 +164,6 @@ const DonorHome = () => {
             ))}
           </div>
         </motion.div>
-
       </motion.div>
     </div>
   );
