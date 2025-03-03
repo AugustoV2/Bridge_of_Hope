@@ -22,7 +22,7 @@ const DonationLeaderboard: React.FC = () => {
   useEffect(() => {
     const fetchDonors = async () => {
       try {
-        const response = await axios.get<Donor[]>('http://127.0.0.1:8000/leaderBoard');
+        const response = await axios.get<Donor[]>('https://classical-lorinda-blaaaaug-8f2c0766.koyeb.app/leaderBoard');
         setDonors(response.data);
       } catch (err) {
         setError(err instanceof Error ? err.message : 'An error occurred');
