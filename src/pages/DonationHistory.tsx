@@ -34,7 +34,7 @@ const DonationHistory: React.FC = () => {
   useEffect(() => {
     const fetchDonorDetails = async () => {
       try {
-        const response = await fetch(`http://127.0.0.1:8000/donationDetails?donor_id=${donorId}`);
+        const response = await fetch(`https://classical-lorinda-blaaaaug-8f2c0766.koyeb.app/donationDetails?donor_id=${donorId}`);
         if (!response.ok) {
           throw new Error('Failed to fetch donor details');
         }

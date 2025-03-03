@@ -52,7 +52,7 @@ const DonorHome = () => {
           throw new Error('Donor ID not found in local storage');
         }
 
-        const response = await axios.get(`http://127.0.0.1:8000/chart?donor_id=${donorId}`);
+        const response = await axios.get(`https://classical-lorinda-blaaaaug-8f2c0766.koyeb.app/chart?donor_id=${donorId}`);
         setChartData(response.data); // Update chart data state
       } catch (err) {
         setError(err instanceof Error ? err.message : 'Failed to fetch donation history');
