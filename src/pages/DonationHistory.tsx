@@ -12,18 +12,8 @@ type Donation = {
   itemname: string;
 };
 
-type DonorDetails = {
-  full_name: string;
-  totalDonations: number;
-  itemsDonated: number;
-  lastDonation: string | null;
-  impactScore: number;
-  recentDonations: Donation[];
-  address: string;
-};
-
 const DonationHistory: React.FC = () => {
-  const [donorDetails, setDonorDetails] = useState<DonorDetails | null>(null);
+  const [donations, setDonations] = useState<Donation[]>([]);
   const [filterOpen, setFilterOpen] = useState(false);
   const [selectedCategory, setSelectedCategory] = useState<string>('');
   const [loading, setLoading] = useState(true);
@@ -34,20 +24,12 @@ const DonationHistory: React.FC = () => {
   useEffect(() => {
     const fetchDonorDetails = async () => {
       try {
-        const response = await fetch(`https://classical-lorinda-blaaaaug-8f2c0766.koyeb.app/donationDetails?donor_id=${donorId}`);
+        const response = await fetch(`http://127.0.0.1:8000/donationDetails?donor_id=${donorId}`);
         if (!response.ok) {
           throw new Error('Failed to fetch donor details');
         }
         const data = await response.json();
-        setDonorDetails({
-          full_name: data.full_name || 'N/A',
-          totalDonations: data.totalDonations || 0,
-          itemsDonated: data.itemsDonated || 0,
-          lastDonation: data.lastDonation || null,
-          impactScore: data.impactScore || 0,
-          recentDonations: [data], // Wrap the single donation in an array
-          address: data.address || 'N/A',
-        });
+        setDonations(data); // Set the donations directly from the backend response
       } catch (err) {
         if (err instanceof Error) {
           setError(err.message);
@@ -63,19 +45,19 @@ const DonationHistory: React.FC = () => {
   }, [donorId]);
 
   const categories = [
-    ...new Set(donorDetails?.recentDonations.map((donation) => donation.itemname)),
+    ...new Set(donations.map((donation) => donation.itemname)),
   ];
 
   const filteredDonations = selectedCategory
-    ? donorDetails?.recentDonations.filter(
+    ? donations.filter(
         (donation) => donation.itemname === selectedCategory
       )
-    : donorDetails?.recentDonations;
+    : donations;
 
-  const totalDonations = filteredDonations?.reduce(
+  const totalDonations = filteredDonations.reduce(
     (sum, donation) => sum + donation.number_items,
     0
-  ) || 0;
+  );
 
   const formatDate = (dateString: string) => {
     const date = new Date(dateString);
@@ -88,7 +70,7 @@ const DonationHistory: React.FC = () => {
 
   // Function to export data as CSV
   const exportToCSV = () => {
-    if (!filteredDonations || filteredDonations.length === 0) {
+    if (filteredDonations.length === 0) {
       alert('No data to export.');
       return;
     }
@@ -126,8 +108,8 @@ const DonationHistory: React.FC = () => {
     return <div>Error: {error}</div>;
   }
 
-  if (!donorDetails) {
-    return <div>No donor details found.</div>;
+  if (donations.length === 0) {
+    return <div>No donations found.</div>;
   }
 
   return (
@@ -221,7 +203,7 @@ const DonationHistory: React.FC = () => {
             </tr>
           </thead>
           <tbody className="bg-white divide-y divide-gray-200">
-            {filteredDonations && filteredDonations.length > 0 ? (
+            {filteredDonations.length > 0 ? (
               filteredDonations.map((donation, index) => (
                 <tr key={index} className="hover:bg-gray-50">
                   <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
@@ -259,7 +241,7 @@ const DonationHistory: React.FC = () => {
         <div className="flex justify-between items-center">
           <p className="text-sm text-gray-700">
             Showing{' '}
-            <span className="font-medium">{filteredDonations?.length || 0}</span>{' '}
+            <span className="font-medium">{filteredDonations.length}</span>{' '}
             donations
           </p>
           <div className="flex space-x-2">
@@ -269,7 +251,10 @@ const DonationHistory: React.FC = () => {
             >
               Export CSV
             </button>
-            <button className="px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-rose-600 hover:bg-rose-700">
+            <button
+              onClick={() => window.location.href = '/donateitems'}
+              className="px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-rose-600 hover:bg-rose-700"
+            >
               Make New Donation
             </button>
           </div>
