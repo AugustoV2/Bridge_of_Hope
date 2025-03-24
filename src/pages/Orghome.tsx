@@ -11,9 +11,10 @@ const OrgHome = () => {
     Total_Pickups: 0,
     Pending_Pickups: 0,
     Completed_Today: 0,
-    successRate: 0, // Optional, can be calculated or removed
+    successRate: 0,
   });
   const [loading, setLoading] = useState(true);
+  const [chartData, setChartData] = useState<{month: string, pickups: number}[]>([]);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -23,9 +24,18 @@ const OrgHome = () => {
         if (response.status === 200 && response.data) {
           setOrgData({
             ...response.data,
-            successRate: 0, // You can calculate this if needed
+            successRate: 0,
           });
         }
+
+        // Generate dummy chart data
+        const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+        const currentYear = new Date().getFullYear();
+        const dummyData = months.map(month => ({
+          month: `${month} ${currentYear}`,
+          pickups: Math.floor(Math.random() * 30) + 5 // Random pickups between 5-35
+        }));
+        setChartData(dummyData);
       } catch (error) {
         console.error('Error fetching data:', error);
       } finally {
@@ -43,6 +53,8 @@ const OrgHome = () => {
       </div>
     );
   }
+
+  const maxPickups = Math.max(...chartData.map(d => d.pickups), 1);
 
   return (
     <div className="min-h-screen bg-gray-50 py-8 px-4 sm:px-6 lg:px-8">
@@ -82,7 +94,7 @@ const OrgHome = () => {
               <Truck className="h-8 w-8 text-blue-500" />
               <div className="ml-4">
                 <p className="text-sm font-medium text-gray-500">Total Pickups</p>
-                <p className="text-2xl font-semibold text-gray-900">10</p>
+                <p className="text-2xl font-semibold text-gray-900">{orgData.Total_Pickups}</p>
               </div>
             </div>
           </motion.div>
@@ -92,7 +104,7 @@ const OrgHome = () => {
               <Clock className="h-8 w-8 text-blue-500" />
               <div className="ml-4">
                 <p className="text-sm font-medium text-gray-500">Pending Pickups</p>
-                <p className="text-2xl font-semibold text-gray-900">5</p>
+                <p className="text-2xl font-semibold text-gray-900">{orgData.Pending_Pickups}</p>
               </div>
             </div>
           </motion.div>
@@ -112,11 +124,50 @@ const OrgHome = () => {
               <TrendingUp className="h-8 w-8 text-blue-500" />
               <div className="ml-4">
                 <p className="text-sm font-medium text-gray-500">Success Rate</p>
-                <p className="text-2xl font-semibold text-gray-900">34%</p>
+                <p className="text-2xl font-semibold text-gray-900">{orgData.successRate}%</p>
               </div>
             </div>
           </motion.div>
         </div>
+
+      
+
+        {/* Animated Wave Chart */}
+        <motion.div 
+          className="bg-white rounded-2xl shadow-xl p-6 w-full"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ delay: 0.5 }}
+        >
+          <h2 className="text-xl font-semibold text-gray-900 mb-6">Pickup Activity</h2>
+          <div className="h-64 w-full flex items-end">
+            {Array.from({ length: 30 }).map((_, index) => {
+              // Create a wave-like pattern with varying heights
+              const height = 20 + Math.sin(index * 0.5) * 15 + Math.random() * 10;
+              return (
+                <motion.div
+                  key={index}
+                  initial={{ height: 0 }}
+                  animate={{ 
+                    height: `${height}%`,
+                    transition: {
+                      delay: index * 0.05,
+                      duration: 0.5,
+                      type: 'spring',
+                      damping: 10
+                    }
+                  }}
+                  className="flex-1 max-w-[16px] bg-gradient-to-t from-blue-300 to-blue-500 rounded-t-full mx-auto"
+                  style={{ originY: 1 }}
+                  whileHover={{ 
+                    height: `${height + 20}%`,
+                    transition: { duration: 0.2 }
+                  }}
+                />
+              );
+            })}
+          </div>
+        </motion.div>
       </motion.div>
     </div>
   );

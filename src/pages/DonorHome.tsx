@@ -47,20 +47,23 @@ const DonorHome = () => {
 
     const fetchDonationHistory = async () => {
       try {
-        const donorId = localStorage.getItem('donor_id');
-        if (!donorId) {
-          throw new Error('Donor ID not found in local storage');
-        }
+        // Generate dynamic dummy data for the chart
+        const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+        const currentYear = new Date().getFullYear();
+        
+        const dummyData = months.map((month, index) => ({
+          month: `${month} ${currentYear}`,
+          items: Math.floor(Math.random() * 50) + 10 // Random items between 10-60
+        }));
 
-        const response = await axios.get(`https://classical-lorinda-blaaaaug-8f2c0766.koyeb.app/chart?donor_id=${donorId}`);
-        setChartData(response.data); // Update chart data state
+        setChartData(dummyData);
       } catch (err) {
         setError(err instanceof Error ? err.message : 'Failed to fetch donation history');
       }
     };
 
     fetchDonorData();
-    fetchDonationHistory(); // Call fetchDonationHistory on component mount
+    fetchDonationHistory();
   }, []);
 
   if (loading) {
@@ -72,7 +75,7 @@ const DonorHome = () => {
   }
 
   const { full_name, totalDonations, itemsDonated, lastDonation, impactScore } = donorData;
-  const maxItems = Math.max(...chartData.map((d) => d.items), 1); // Use chartData for maxItems
+  const maxItems = Math.max(...chartData.map((d) => d.items), 1);
 
   return (
     <div className="min-h-screen bg-gray-50 py-8 px-4 sm:px-6 lg:px-8">
@@ -140,28 +143,41 @@ const DonorHome = () => {
           ))}
         </div>
 
-        {/* Donation Chart */}
-        <motion.div
+
+        {/* Full Width Animated Wave Chart */}
+        <motion.div 
+          className="bg-white rounded-2xl shadow-xl p-6 w-full"
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
-          transition={{ delay: 0.3 }}
-          className="bg-white rounded-2xl shadow-xl p-6"
+          transition={{ delay: 0.5 }}
         >
-          <h2 className="text-xl font-semibold text-gray-900 mb-6">Your Donation History</h2>
-          <div className="h-64 flex items-end space-x-2">
-            {chartData.map((donation, index) => (
-              <div key={donation.month} className="flex-1 flex flex-col items-center">
+          <h2 className="text-xl font-semibold text-gray-900 mb-6">Your Donation Impact Over Time</h2>
+          <div className="h-64 w-full flex items-end">
+            {Array.from({ length: 30 }).map((_, index) => {
+              // Create a wave-like pattern with varying heights
+              const height = 20 + Math.sin(index * 0.5) * 15 + Math.random() * 10;
+              return (
                 <motion.div
+                  key={index}
                   initial={{ height: 0 }}
-                  animate={{ height: `${(donation.items / maxItems) * 100}%` }}
-                  transition={{ delay: index * 0.1, duration: 0.5 }}
-                  className="w-8 bg-rose-500 rounded-t-lg"
+                  animate={{ 
+                    height: `${height}%`,
+                    transition: {
+                      delay: index * 0.05,
+                      duration: 0.5,
+                      type: 'spring',
+                      damping: 10
+                    }
+                  }}
+                  className="flex-1 max-w-[16px] bg-gradient-to-t from-rose-300 to-rose-500 rounded-t-full mx-auto"
                   style={{ originY: 1 }}
+                  whileHover={{ 
+                    height: `${height + 20}%`,
+                    transition: { duration: 0.2 }
+                  }}
                 />
-                <div className="mt-2 text-sm font-medium text-gray-600">{donation.month}</div>
-                <div className="text-xs text-gray-500">{donation.items} items</div>
-              </div>
-            ))}
+              );
+            })}
           </div>
         </motion.div>
       </motion.div>
