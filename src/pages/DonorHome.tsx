@@ -86,32 +86,32 @@ const DonorHome = () => {
         className="max-w-6xl mx-auto"
       >
         {/* Welcome Section */}
-        <div className="bg-gradient-to-r from-rose-500 to-rose-600 rounded-2xl shadow-xl p-8 mb-8">
-          <div className="flex justify-between items-center">
-            <div>
-              <h1 className="text-3xl font-bold text-white mb-2">Welcome back, {full_name}!</h1>
-              <p className="text-rose-100">Your generosity continues to make a difference in our community.</p>
-            </div>
-            <div className="flex space-x-4">
-              <motion.button
-                whileHover={{ scale: 1.05 }}
-                whileTap={{ scale: 0.95 }}
-                onClick={() => navigate('/donateitems')}
-                className="bg-white text-rose-600 px-6 py-3 rounded-lg font-semibold shadow-md hover:shadow-lg transition-all"
-              >
-                Make a Donation
-              </motion.button>
-              <motion.button
-                whileHover={{ scale: 1.05 }}
-                whileTap={{ scale: 0.95 }}
-                onClick={() => navigate('/History')}
-                className="bg-white text-rose-600 px-6 py-3 rounded-lg font-semibold shadow-md hover:shadow-lg transition-all"
-              >
-                History
-              </motion.button>
-            </div>
-          </div>
-        </div>
+        <div className="bg-gradient-to-r from-rose-500 to-rose-600 rounded-2xl shadow-xl p-4 md:p-8 mb-8">
+  <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+    <div className="flex-1">
+      <h1 className="text-2xl md:text-3xl font-bold text-white mb-2">Welcome back, {full_name}!</h1>
+      <p className="text-rose-100">Your generosity continues to make a difference in our community.</p>
+    </div>
+    <div className="flex flex-col sm:flex-row gap-3 w-full md:w-auto">
+      <motion.button
+        whileHover={{ scale: 1.05 }}
+        whileTap={{ scale: 0.95 }}
+        onClick={() => navigate('/donateitems')}
+        className="bg-white text-rose-600 px-4 py-2 md:px-6 md:py-3 rounded-lg font-semibold shadow-md hover:shadow-lg transition-all text-sm md:text-base"
+      >
+        Make a Donation
+      </motion.button>
+      <motion.button
+        whileHover={{ scale: 1.05 }}
+        whileTap={{ scale: 0.95 }}
+        onClick={() => navigate('/History')}
+        className="bg-white text-rose-600 px-4 py-2 md:px-6 md:py-3 rounded-lg font-semibold shadow-md hover:shadow-lg transition-all text-sm md:text-base"
+      >
+        History
+      </motion.button>
+    </div>
+  </div>
+</div>
 
         {error && <div className="text-center mb-4 text-red-500">{error}</div>}
 
